@@ -5,75 +5,57 @@ import Avatar from "./Avatar";
 import { UserContext } from "../contexts/UserContext";
 import Preloader from "./Preloader";
 import Image from "next/image";
-
-interface UserProfile {
-  avatar?: string | null;
-  name?: string | null;
-}
+import { profile } from "@/types/profile";
 
 const PostFormCard: React.FC = () => {
-  const [content, setContent] = useState("");
-  const [uploads, setUploads] = useState<string[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
+  const [profile, setProfile] = useState<profile | null>(null);
+  const [content, setContent] = useState<string>("");
   const supabase = useSupabaseClient();
   const session = useSession();
-  const { profile } = useContext(UserContext) as { profile: UserProfile };
+  //ログインユーザーの情報を取得
+  useEffect(() => {
+    supabase
+      .from("profiles")
+      .select()
+      .eq("id", session?.user.id)
+      .then((result) => {
+        if (result.data?.length) {
+          setProfile(result.data[0]);
+        }
+      });
+  }, [session?.user.id, supabase]);
 
-  function createPost() {
-    if (!session) return;
-
+  const createPost = () => {
     supabase
       .from("posts")
       .insert({
-        author: session.user.id,
-        content,
-        photos: uploads,
+        author: session?.user.id,
+        content: content,
       })
       .then((response) => {
         if (!response.error) {
           setContent("");
-          setUploads([]);
+          alert("投稿しました");
         }
       });
-  }
-
-  async function addPhotos(ev: React.ChangeEvent<HTMLInputElement>) {
-    const files = ev.target.files;
-    if (files && files.length > 0) {
-      setIsUploading(true);
-      for (const file of Array.from(files)) {
-        const newName = Date.now() + file.name;
-        const result = await supabase.storage
-          .from("photos")
-          .upload(newName, file);
-        if (result.data) {
-          const url =
-            process.env.NEXT_PUBLIC_SUPABASE_URL +
-            "/storage/v1/object/public/photos/" +
-            result.data.path;
-          setUploads((prevUploads) => [...prevUploads, url]);
-        } else {
-          console.log(result);
-        }
-      }
-      setIsUploading(false);
-    }
-  }
+  };
 
   return (
     <Card>
       <div className="flex gap-2">
-        <div>{/* <Avatar url={profile?.avatar} /> */}</div>
+        <div>
+          <Avatar url={profile?.avatar!} />
+        </div>
         {profile && (
           <textarea
+            className="grow p-3 h-14"
+            placeholder={`Whats on your mind,${profile?.name}?`}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="grow p-3 h-14"
-            placeholder={`Whats on your mind, ${profile?.name}?`}
           />
         )}
       </div>
-      {isUploading && (
+      {/* {isUploading && (
         <div>
           <Preloader />
         </div>
@@ -90,7 +72,7 @@ const PostFormCard: React.FC = () => {
             </div>
           ))}
         </div>
-      )}
+      )} */}
       <div className="flex gap-5 items-center mt-2">
         <div>
           <label className="flex gap-1">
@@ -98,7 +80,7 @@ const PostFormCard: React.FC = () => {
               type="file"
               className="hidden"
               multiple
-              onChange={addPhotos}
+              // onChange={addPhotos}
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -182,7 +164,7 @@ const PostFormCard: React.FC = () => {
         <div className="grow text-right">
           <button
             onClick={createPost}
-            className="bg-socialBlue text-white px-6 py-1 rounded-md"
+            className="text-white px-6 py-1 rounded-md bg-blue-500"
           >
             Share
           </button>

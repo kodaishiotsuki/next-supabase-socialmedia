@@ -1,0 +1,11 @@
+{
+  "iss": "https://www.googleapis.com/userinfo/v2/me",
+  "sub": "112449115210370182806",
+  "name": "Kodai Shiotsuki",
+  "email": "0711dr5@gmail.com",
+  "picture": "https://lh3.googleusercontent.com/a/AGNmyxb9vLcF0pJoVSHXvvnYZx_RBZj4hoSSKTVZpaUgPLI=s96-c",
+  "full_name": "Kodai Shiotsuki",
+  "avatar_url": "https://lh3.googleusercontent.com/a/AGNmyxb9vLcF0pJoVSHXvvnYZx_RBZj4hoSSKTVZpaUgPLI=s96-c",
+  "provider_id": "112449115210370182806",
+  "email_verified": true
+}
