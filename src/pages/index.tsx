@@ -44,7 +44,7 @@ export default function Home() {
   const fetchPosts = () => {
     supabase
       .from("posts")
-      .select("id, content, created_at, profiles(id,name,avatar)")
+      .select("id, content, created_at, photos, profiles(id,name,avatar)")
       .order("created_at", { ascending: false })
       .then((result) => {
         if (result.data?.length) {

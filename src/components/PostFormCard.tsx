@@ -22,10 +22,12 @@ const PostFormCard = ({ onPost }: { onPost: VoidFunction }) => {
       .insert({
         author: session?.user.id,
         content: content,
+        photos: uploads,
       })
       .then((response) => {
         if (!response.error) {
           setContent("");
+          setUploads([]);
           //投稿後に投稿一覧を更新する
           if (onPost) {
             onPost();

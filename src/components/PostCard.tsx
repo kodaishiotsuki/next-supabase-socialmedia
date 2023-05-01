@@ -8,6 +8,7 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { post } from "@/types/post";
 import ClickOutHandler from "react-clickout-handler";
 import { profile } from "@/types/profile";
+import Image from "next/image";
 
 export default function PostCard({ post }: { post: post }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -26,9 +27,9 @@ export default function PostCard({ post }: { post: post }) {
     <Card>
       <div className="flex gap-3">
         <div>
-          <Link href={"/profile"}>
+          <Link href={"/profile/" + post?.profiles?.id}>
             <span className="cursor-pointer">
-              <Avatar url={post.profiles?.avatar} />
+              <Avatar url={post?.profiles?.avatar} />
             </span>
           </Link>
         </div>
@@ -36,7 +37,7 @@ export default function PostCard({ post }: { post: post }) {
           <p>
             <Link href={"/profile/"}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
-                {post.profiles?.name}
+                {post?.profiles?.name}
               </span>
             </Link>
             shared a post
@@ -190,15 +191,21 @@ export default function PostCard({ post }: { post: post }) {
       </div>
       <div>
         <p className="my-3 text-sm">{post?.content}</p>
-        {/* {photos?.length > 0 && (
+        {post?.photos?.length! > 0 && (
           <div className="flex gap-4">
-            {photos.map((photo) => (
+            {post?.photos!.map((photo) => (
               <div key={photo} className="">
-                <img src={photo} className="rounded-md" alt="" />
+                <Image
+                  src={photo}
+                  className="rounded-md"
+                  alt="photos"
+                  width={200}
+                  height={200}
+                />
               </div>
             ))}
           </div>
-        )} */}
+        )}
       </div>
       <div className="mt-5 flex gap-8">
         <button className="flex gap-2 items-center">
