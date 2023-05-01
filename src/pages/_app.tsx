@@ -3,6 +3,11 @@ import type { AppProps } from "next/app";
 import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider, Session } from "@supabase/auth-helpers-react";
 import { useState } from "react";
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
+
+// Initialize the desired locale.
+// TimeAgo.addDefaultLocale(en);
 
 function MyApp({
   Component,
@@ -18,6 +23,7 @@ function MyApp({
       supabaseClient={supabaseClient}
       initialSession={pageProps.initialSession}
     >
+
       <Component {...pageProps} />
     </SessionContextProvider>
   );

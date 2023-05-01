@@ -2,29 +2,20 @@ import React, { useContext, useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Card from "./Card";
 import Avatar from "./Avatar";
-import { UserContext } from "../contexts/UserContext";
 import Preloader from "./Preloader";
 import Image from "next/image";
 import { profile } from "@/types/profile";
+import { UserContext } from "@/contexts/UserContext";
 
-const PostFormCard: React.FC = () => {
-  const [profile, setProfile] = useState<profile | null>(null);
+const PostFormCard = ({ onPost }: { onPost: VoidFunction }) => {
   const [content, setContent] = useState<string>("");
+  const [uploads, setUploads] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const supabase = useSupabaseClient();
   const session = useSession();
-  //ログインユーザーの情報を取得
-  useEffect(() => {
-    supabase
-      .from("profiles")
-      .select()
-      .eq("id", session?.user.id)
-      .then((result) => {
-        if (result.data?.length) {
-          setProfile(result.data[0]);
-        }
-      });
-  }, [session?.user.id, supabase]);
+  const myProfile = useContext(UserContext) as profile;
 
+  // 新規投稿
   const createPost = () => {
     supabase
       .from("posts")
@@ -35,44 +26,73 @@ const PostFormCard: React.FC = () => {
       .then((response) => {
         if (!response.error) {
           setContent("");
-          alert("投稿しました");
+          //投稿後に投稿一覧を更新する
+          if (onPost) {
+            onPost();
+          }
         }
       });
+  };
+
+  const addPhotos = async (e: any) => {
+    const files = e.target.files;
+    if (files.length > 0) {
+      //アップロード中はtrue
+      setIsUploading(true);
+      //アップロード
+      for (const file of files) {
+        const newName = Date.now() + file.name;
+        //storageにアップロード
+        const result = await supabase.storage
+          .from("photos")
+          .upload(newName, file);
+        //アップロードした画像のURLを取得
+        if (result.data) {
+          const url =
+            process.env.NEXT_PUBLIC_SUPABASE_URL +
+            "/storage/v1/object/public/photos/" +
+            result.data.path;
+          //アップロードした画像のURLを配列に追加
+          setUploads((prevUploads) => [...prevUploads, url]);
+        }
+      }
+      //アップロードが終わったらfalse
+      setIsUploading(false);
+    }
   };
 
   return (
     <Card>
       <div className="flex gap-2">
         <div>
-          <Avatar url={profile?.avatar!} />
+          <Avatar url={myProfile?.avatar!} />
         </div>
-        {profile && (
+        {myProfile && (
           <textarea
             className="grow p-3 h-14"
-            placeholder={`Whats on your mind,${profile?.name}?`}
+            placeholder={`Whats on your mind,${myProfile?.name}?`}
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />
         )}
       </div>
-      {/* {isUploading && (
-        <div>
-          <Preloader />
-        </div>
-      )}
+      {isUploading && <Preloader />}
+      {/* 画像のプレビュー */}
       {uploads.length > 0 && (
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           {uploads.map((upload) => (
             <div className="mt-2" key={upload}>
               <Image
                 src={upload as string}
-                alt="test"
-                className="w-auto h-24 rounded-md"
+                alt="upload preview"
+                className="w-auto rounded-md"
+                width={96}
+                height={96}
               />
             </div>
           ))}
         </div>
-      )} */}
+      )}
       <div className="flex gap-5 items-center mt-2">
         <div>
           <label className="flex gap-1">
@@ -80,7 +100,7 @@ const PostFormCard: React.FC = () => {
               type="file"
               className="hidden"
               multiple
-              // onChange={addPhotos}
+              onChange={addPhotos}
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -7,9 +7,11 @@ import { UserContext } from "../contexts/UserContext";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { post } from "@/types/post";
 import ClickOutHandler from "react-clickout-handler";
+import { profile } from "@/types/profile";
 
 export default function PostCard({ post }: { post: post }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const myProfile = useContext(UserContext) as profile;
 
   function openDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
@@ -39,8 +41,9 @@ export default function PostCard({ post }: { post: post }) {
             </Link>
             shared a post
           </p>
+          {/* 投稿日時を表示 */}
           <p className="text-gray-500 text-sm">
-            <ReactTimeAgo date={new Date().getTime()} />
+            <ReactTimeAgo date={new Date(post?.created_at!).getTime()} />
           </p>
         </div>
         <div className="relative">
@@ -250,7 +253,7 @@ export default function PostCard({ post }: { post: post }) {
       </div>
       <div className="flex mt-4 gap-3">
         <div>
-          <Avatar />
+          <Avatar url={myProfile?.avatar} />
         </div>
         <div className="border grow rounded-full relative">
           <form>
