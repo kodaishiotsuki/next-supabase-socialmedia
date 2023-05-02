@@ -35,7 +35,7 @@ export default function PostCard({ post }: { post: post }) {
         </div>
         <div className="grow">
           <p>
-            <Link href={"/profile/"}>
+            <Link href={"/profile/" + post?.profiles?.id}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
                 {post?.profiles?.name}
               </span>

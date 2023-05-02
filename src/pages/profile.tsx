@@ -19,12 +19,19 @@ export default function ProfilePage() {
   const tab = router?.query?.tab?.[0] || "posts";
   const supabase = useSupabaseClient();
   const session = useSession();
+  //ログインユーザーのプロフィールかどうか
+  const isMyUser = session?.user?.id === userId;
 
   //profileテーブルからユーザー情報を取得
   useEffect(() => {
     if (!userId) {
       return;
     }
+    fetchUser();
+  }, []);
+
+  //profileテーブルからユーザー情報を取得する関数
+  const fetchUser = () => {
     supabase
       .from("profiles")
       .select()
@@ -37,27 +44,22 @@ export default function ProfilePage() {
           setProfile(result.data[0]);
         }
       });
-  }, []);
+  };
 
   return (
     <Layout>
       <Card noPadding={true}>
         <div className="relative overflow-hidden rounded-md">
-          {/* <Cover
+          <Cover
             url={profile?.cover}
             editable={isMyUser}
             onChange={fetchUser}
-          /> */}
+          />
+
           <div className="absolute top-24 left-4 z-20">
-            {/* {profile && (
-              <Avatar
-                url={profile.avatar}
-                size={"lg"}
-                editable={isMyUser}
-                onChange={fetchUser}
-              />
-            )} */}
+            {profile && <Avatar url={profile.avatar} size={"lg"} />}
           </div>
+
           <div className="p-4 pt-0 md:pt-4 pb-0">
             <div className="ml-24 md:ml-40 flex justify-between">
               <div>
@@ -74,11 +76,7 @@ export default function ProfilePage() {
                 )}
                 <h1 className="text-3xl font-bold">{profile?.name}</h1>
 
-                {/* {!editMode && (
-                  <div className="text-gray-500 leading-4">
-                    {profile?.place || "Internet"}
-                  </div>
-                )} */}
+                <div className="text-gray-500 leading-4">{profile?.place}</div>
                 {editMode && (
                   <div>
                     <input
