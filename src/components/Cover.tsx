@@ -2,6 +2,7 @@ import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { ChangeEvent, useState } from "react";
 import { FaCameraRetro } from "react-icons/fa";
 import Preloader from "./Preloader";
+import { uploadUserPlofileImage } from "@/helpers/user";
 
 const Cover = ({
   url,
@@ -15,37 +16,24 @@ const Cover = ({
   const supabase = useSupabaseClient();
   const session = useSession();
   const [isUpLoading, setIsUpLoading] = useState<boolean>(false);
+
   //カバー画像の更新
   const updateCover = async (e: ChangeEvent<HTMLInputElement>) => {
+    //アップロードするファイルを取得
     const file = e.target.files?.[0];
     if (file) {
       setIsUpLoading(true);
-      const newName = `${Date.now()}_${file.name}`;
-      const { data, error } = await supabase.storage
-        .from("covers")
-        .upload(newName, file);
+      //カバー画像をアップロード
+      await uploadUserPlofileImage({
+        supabase,
+        userId: session?.user.id!,
+        file,
+        bucket: "covers",
+        profileCoulumn: "cover",
+      });
       setIsUpLoading(false);
-
-      if (error) throw error;
-
-      //アップロードした画像のURLを取得
-      if (data) {
-        const url =
-          process.env.NEXT_PUBLIC_SUPABASE_URL +
-          "/storage/v1/object/public/covers/" +
-          data.path;
-        //profilesテーブルのcoverカラムを更新
-        supabase
-          .from("profiles")
-          .update({ cover: url })
-          .eq("id", session?.user.id)
-          .then((result) => {
-            if (!result.error && onChange) {
-              //親コンポーネントのfetchUserを実行
-              onChange();
-            }
-          });
-      }
+      //カバー画像を更新
+      onChange && onChange();
     }
   };
 
