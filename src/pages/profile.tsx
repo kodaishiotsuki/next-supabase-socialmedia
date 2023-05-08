@@ -123,7 +123,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="grow">
-                <div>
+                <div className="text-right">
                   {isMyUser && !editMode && (
                     <button
                       onClick={() => {
@@ -142,12 +142,12 @@ export default function ProfilePage() {
                     <>
                       <button
                         onClick={saveProfile}
-                        className="inline-flex gap-2 items-center rounded-md shadow-sm shadow-gray-500 py-1 px-2"
+                        className="inline-flex gap-2 items-center rounded-md shadow-sm shadow-gray-500 py-1 px-2 mx-2"
                       >
                         Save profile
                       </button>
                       <button
-                        onClick={saveProfile}
+                        onClick={() => setEditMode(false)}
                         className="inline-flex gap-2 items-center rounded-md shadow-sm shadow-gray-500 py-1 px-2"
                       >
                         Cancel
