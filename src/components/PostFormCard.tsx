@@ -1,11 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useAuth } from "@/contexts/UserContext";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import Card from "./Card";
-import Avatar from "./Avatar";
-import Preloader from "./Preloader";
 import Image from "next/image";
-import { profile } from "@/types/profile";
-import { UserContext } from "@/contexts/UserContext";
+import { useState } from "react";
+import Avatar from "./Avatar";
+import Card from "./Card";
+import Preloader from "./Preloader";
 
 const PostFormCard = ({ onPost }: { onPost: VoidFunction }) => {
   const [content, setContent] = useState<string>("");
@@ -13,7 +12,7 @@ const PostFormCard = ({ onPost }: { onPost: VoidFunction }) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const supabase = useSupabaseClient();
   const session = useSession();
-  const myProfile = useContext(UserContext) as profile;
+  const { profile } = useAuth();
 
   // 新規投稿
   const createPost = () => {
@@ -67,12 +66,12 @@ const PostFormCard = ({ onPost }: { onPost: VoidFunction }) => {
     <Card>
       <div className="flex gap-2">
         <div>
-          <Avatar url={myProfile?.avatar!} />
+          <Avatar url={profile?.avatar!} />
         </div>
-        {myProfile && (
+        {profile && (
           <textarea
             className="grow p-3 h-14"
-            placeholder={`Whats on your mind,${myProfile?.name}?`}
+            placeholder={`Whats on your mind,${profile?.name}?`}
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />

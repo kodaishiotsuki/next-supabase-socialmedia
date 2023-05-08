@@ -1,18 +1,16 @@
+import { useAuth } from "@/contexts/UserContext";
+import { post } from "@/types/post";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import ClickOutHandler from "react-clickout-handler";
+import ReactTimeAgo from "react-time-ago";
 import Avatar from "./Avatar";
 import Card from "./Card";
-import { useContext, useEffect, useState } from "react";
-import Link from "next/link";
-import ReactTimeAgo from "react-time-ago";
-import { UserContext } from "../contexts/UserContext";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { post } from "@/types/post";
-import ClickOutHandler from "react-clickout-handler";
-import { profile } from "@/types/profile";
-import Image from "next/image";
 
 export default function PostCard({ post }: { post: post }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const myProfile = useContext(UserContext) as profile;
+  const { profile } = useAuth();
 
   function openDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
@@ -260,7 +258,7 @@ export default function PostCard({ post }: { post: post }) {
       </div>
       <div className="flex mt-4 gap-3">
         <div>
-          <Avatar url={myProfile?.avatar} />
+          <Avatar url={profile?.avatar} />
         </div>
         <div className="border grow rounded-full relative">
           <form>

@@ -5,6 +5,7 @@ import { SessionContextProvider, Session } from "@supabase/auth-helpers-react";
 import { useState } from "react";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
+import { UserContextProvider } from "@/contexts/UserContext";
 
 // Initialize the desired locale.
 // TimeAgo.addDefaultLocale(en);
@@ -23,8 +24,9 @@ function MyApp({
       supabaseClient={supabaseClient}
       initialSession={pageProps.initialSession}
     >
-
-      <Component {...pageProps} />
+      <UserContextProvider>
+        <Component {...pageProps} />
+      </UserContextProvider>
     </SessionContextProvider>
   );
 }

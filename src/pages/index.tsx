@@ -9,7 +9,6 @@ import TimeAgo from "javascript-time-ago";
 // The desired locale.
 import en from "javascript-time-ago/locale/en";
 import { profile } from "@/types/profile";
-import { UserContext } from "@/contexts/UserContext";
 // Initialize the desired locale.
 TimeAgo.addDefaultLocale(en);
 
@@ -17,7 +16,7 @@ export default function Home() {
   const session = useSession();
   const supabase = useSupabaseClient();
   const [posts, setPosts] = useState<post[] | null>(null);
-  const [profile, setProfile] = useState<profile | null>(null);
+  const [profile, setProfile] = useState<profile>();
 
   //投稿一覧を取得
   useEffect(() => {
@@ -60,11 +59,9 @@ export default function Home() {
 
   return (
     <Layout>
-      <UserContext.Provider value={profile!}>
-        <PostFormCard onPost={fetchPosts} />
-        {posts?.length &&
-          posts?.map((post) => <PostCard key={post.id} post={post} />)}
-      </UserContext.Provider>
+      <PostFormCard onPost={fetchPosts} />
+      {posts?.length &&
+        posts?.map((post) => <PostCard key={post.id} post={post} />)}
     </Layout>
   );
 }
